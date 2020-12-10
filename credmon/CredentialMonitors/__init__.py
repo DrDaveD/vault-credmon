@@ -1,3 +1,2 @@
-from credmon.CredentialMonitors.OAuthCredmon import OAuthCredmon
-from credmon.CredentialMonitors.LocalCredmon import LocalCredmon
+from credmon.CredentialMonitors.VaultCredmon import VaultCredmon
 

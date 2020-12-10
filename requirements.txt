@@ -1,6 +1,5 @@
 htcondor>=8.8.2
 requests_oauthlib
 six
-flask
 cryptography
 scitokens
