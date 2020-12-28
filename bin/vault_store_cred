@@ -120,7 +120,15 @@ for SERVICE; do
     if $SHOWSTORING; then
 	echo "Storing condor credentials for $SERVICE" >&2
     fi
-    echo "$CRED"|condor_store_cred add-oauth -s "$SERVICE" -i - >/dev/null
+    echo "$CRED"|(
+        # convert the two lines to json
+        read TOK
+        read URL
+        echo "{"
+        echo "  \"vault_token\": \"$TOK\","
+        echo "  \"vault_url\": \"$URL\""
+        echo "}"
+        )|condor_store_cred add-oauth -s "$SERVICE" -i - >/dev/null
     if [ $? != 0 ]; then
 	fatal "Failed to store condor credentials for $SERVICE"
     fi
