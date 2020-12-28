@@ -26,6 +26,7 @@ class VaultCredmon(AbstractCredentialMonitor):
 
     def should_renew(self, username, token_name):
         access_token_path = os.path.join(self.cred_dir, username, token_name + '.use')
+        top_path = os.path.join(self.cred_dir, username, token_name + '.top')
 
         # check if access token exists
         if not os.path.exists(access_token_path):
@@ -39,6 +40,12 @@ class VaultCredmon(AbstractCredentialMonitor):
         # check if token is past its refresh time
         if time.time() > refresh_time:
             return True
+
+        # check if top file is newer than access token
+        if os.path.exists(top_path):
+            top_time = os.path.getctime(top_path)
+            if top_time > create_time:
+                return True
 
         return False
 
