@@ -11,11 +11,10 @@ setup(
     author_email = 'jpatton@cs.wisc.edu',
     license = 'MIT',
     packages = find_packages(),
-    scripts = ['bin/condor_credmon_vault', 'bin/vault_credential_producer'],
+    scripts = ['bin/condor_credmon_vault', 'bin/vault_store_cred'],
     install_requires = [
         'htcondor >= 8.8.2',
         'six',
-        'cryptography',
         ],
     include_package_data = True
     )
