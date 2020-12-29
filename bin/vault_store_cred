@@ -40,6 +40,11 @@ if [ "$#" = 0 ]; then
     usage
 fi
 
+STOREOUT=/dev/null
+if [ "" != "$VERBOSE" ]; then
+    STOREOUT=/dev/stdout
+fi
+
 CONDOROPTS="$(condor_config_val SEC_CREDENTIAL_GETTOKEN_OPTS 2>/dev/null)"
 if [ -z "$CONDOROPTS" ] && [ -z "$HTGETTOKENOPTS" ]; then
     fatal 'Neither SEC_CREDENTIAL_GETTOKEN_OPTS condor value nor $HTGETTOKENS environment set'
@@ -128,7 +133,7 @@ for SERVICE; do
         echo "  \"vault_token\": \"$TOK\","
         echo "  \"vault_url\": \"$URL\""
         echo "}"
-        )|condor_store_cred add-oauth -s "$SERVICE" -i - >/dev/null
+        )|condor_store_cred add-oauth -s "$SERVICE" -i - >$STOREOUT
     if [ $? != 0 ]; then
 	fatal "Failed to store condor credentials for $SERVICE"
     fi
