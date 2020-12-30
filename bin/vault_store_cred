@@ -1,11 +1,28 @@
 #!/bin/bash
 #
-# Obtain and store condor credentials for each oath_service listed in
+# Obtain and store condor credentials for each given oath_service 
+# Can be run automatically from condor_submit when configured as
+#   SEC_CREDENTIAL_STORER.
 
 ME="${0##*/}"
 
+env >/tmp/vault_store_cred.env
+
+# When condor_submit launches this the cursor is not at the beginning
+#   of a new line, so always send a newline before anything else to
+#   stdout or stderr.
+NEWLINENEEDED=true
+newlineifneeded()
+{
+    if $NEWLINENEEDED; then
+        echo
+        NEWLINENEEDED=false
+    fi
+}
+
 usage()
 {
+    newlineifneeded
     echo "Usage: $ME [-vd] oauth_service ..."
     echo "  -v shows more progress than normal" 
     echo "  -d shows a lot of debug information" 
@@ -15,6 +32,7 @@ usage()
 
 fatal()
 {
+    newlineifneeded
     echo "$ME: $@"
     exit 1
 } >&2
@@ -22,6 +40,7 @@ fatal()
 verbose()
 {
     if [ -n "$VERBOSE" ]; then
+        newlineifneeded
 	echo "$@" >&2
     fi
 }
@@ -78,6 +97,10 @@ for SERVICE; do
 	    fatal "Only one hyphen allowed in use_oauth_services name"
 	fi
     fi
+    if [ -f $VTOKEN.$SERVICE ] && ! condor_store_cred query-oauth -s $SERVICE >/dev/null; then
+        verbose "Removing $VTOKEN.$SERVICE because there are no $SERVICE credentials stored"
+        rm -f $VTOKEN.$SERVICE
+    fi
     if [ -n "$BTOKEN" ]; then
 	OPTS="-o $BTOKEN.$SERVICE $OPTS"
     fi
@@ -89,6 +112,7 @@ for SERVICE; do
 	# OIDC authentication probably needed, so remove -q to tell the user
 	#  what is happening
 	SHOWSTORING=true
+        newlineifneeded
 	echo "Authentication needed for $SERVICE" >&2
 	CRED="`htgettoken $OPTS $VERBOSE`"
 	if [ $? != 0 ]; then
