@@ -1,5 +1,8 @@
 # HTCondor Vault CredMon
 
+NOTE: This is obsolete.  This code has been integrated into HTCondor and
+  development continued there.
+
 The HTCondor Vault CredMon monitors and refreshes credentials
 that are being managed by the HTCondor CredD. 
 The CredMon will then monitor and refresh these tokens by reading from
